@@ -8,9 +8,11 @@
 .buildlog/
 .history
 .svn/
+.vscode/
+migrate_working_dir/
 
 # IntelliJ related
-*.iml
+#*.iml
 *.ipr
 *.iws
 .idea/
@@ -22,18 +24,36 @@
 
 # Flutter/Dart/Pub related
 **/doc/api/
+**/ios/Flutter/.last_build_id
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
-.packages
+#.packages
 .pub-cache/
 .pub/
 /build/
-ios/Pods/*
-ios/Runner.xcworkspace/xcuserdata/*
-ios/.symlinks/
+
 # Web related
 lib/generated_plugin_registrant.dart
 
-# Exceptions to above rules.
-!/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+
+# Generated code
+*.g.dart
+
+# pubspec.lock
+pubspec.lock
+
+# IOS PodFile
+#Podfile
+*.lock

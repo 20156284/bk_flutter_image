@@ -20,7 +20,7 @@ A new flutter plugin project.
 
 
   s.dependency 'Flutter'
-  s.dependency 'SDWebImage', '>= 5.12.6'
+  s.dependency 'SDWebImage', '>= 5.17.0'
 
   s.ios.deployment_target = '10.0'
   # Flutter.framework does not contain a i386 slice. Only x86_64 simulators are supported.

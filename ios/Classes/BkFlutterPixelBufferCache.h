@@ -6,8 +6,10 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SDMemoryCache.h"
-#import "SDImageCacheConfig.h"
+#import <SDWebImage/SDMemoryCache.h>
+#import <SDWebImage/SDImageCacheConfig.h>
+//#import "SDMemoryCache.h"
+//#import "SDImageCacheConfig.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

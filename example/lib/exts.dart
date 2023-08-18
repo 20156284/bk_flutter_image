@@ -2,13 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/material.dart';
 import 'package:bk_flutter_image/bk_flutter_image.dart';
+import 'package:flutter/material.dart';
 
-enum GridDemoTileStyle {
-  deleteMode,
-  selectMode
-}
+enum GridDemoTileStyle { deleteMode, selectMode }
 
 typedef BannerTapCallback = void Function(Photo photo);
 
@@ -22,25 +19,26 @@ class Photo {
     this.title,
     this.caption,
     this.isFavorite = false,
-    this.mode=BoxFit.fill,
+    this.mode = BoxFit.fill,
   });
 
-  final String url;
-  final String assetPackage;
-  final String title;
-  final String caption;
-  final BoxFit mode;
+  final String? url;
+  final String? assetPackage;
+  final String? title;
+  final String? caption;
+  final BoxFit? mode;
 
   bool isFavorite;
-  String get tag => url; // Assuming that all asset names are unique.
+  String get tag => url!; // Assuming that all asset names are unique.
 
-  bool get isValid => url != null && title != null && caption != null && isFavorite != null;
+  bool get isValid =>
+      url != null && title != null && caption != null && isFavorite;
 }
 
 class GridPhotoViewer extends StatefulWidget {
-  const GridPhotoViewer({ Key key, this.photo }) : super(key: key);
+  const GridPhotoViewer({Key? key, this.photo}) : super(key: key);
 
-  final Photo photo;
+  final Photo? photo;
 
   @override
   _GridPhotoViewerState createState() => _GridPhotoViewerState();
@@ -61,13 +59,14 @@ class _GridTitleText extends StatelessWidget {
   }
 }
 
-class _GridPhotoViewerState extends State<GridPhotoViewer> with SingleTickerProviderStateMixin {
-  AnimationController _controller;
-  Animation<Offset> _flingAnimation;
+class _GridPhotoViewerState extends State<GridPhotoViewer>
+    with SingleTickerProviderStateMixin {
+  AnimationController? _controller;
+  Animation<Offset>? _flingAnimation;
   Offset _offset = Offset.zero;
   double _scale = 1.0;
-  Offset _normalizedOffset;
-  double _previousScale;
+  Offset? _normalizedOffset;
+  double? _previousScale;
 
   @override
   void initState() {
@@ -78,21 +77,22 @@ class _GridPhotoViewerState extends State<GridPhotoViewer> with SingleTickerProv
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller!.dispose();
     super.dispose();
   }
 
   // The maximum offset value is 0,0. If the size of this renderer's box is w,h
   // then the minimum offset value is w - _scale * w, h - _scale * h.
   Offset _clampOffset(Offset offset) {
-    final Size size = context.size;
+    final Size size = context.size!;
     final Offset minOffset = Offset(size.width, size.height) * (1.0 - _scale);
-    return Offset(offset.dx.clamp(minOffset.dx, 0.0), offset.dy.clamp(minOffset.dy, 0.0));
+    return Offset(
+        offset.dx.clamp(minOffset.dx, 0.0), offset.dy.clamp(minOffset.dy, 0.0));
   }
 
   void _handleFlingAnimation() {
     setState(() {
-      _offset = _flingAnimation.value;
+      _offset = _flingAnimation!.value;
     });
   }
 
@@ -101,29 +101,28 @@ class _GridPhotoViewerState extends State<GridPhotoViewer> with SingleTickerProv
       _previousScale = _scale;
       _normalizedOffset = (details.focalPoint - _offset) / _scale;
       // The fling animation stops if an input gesture starts.
-      _controller.stop();
+      _controller!.stop();
     });
   }
 
   void _handleOnScaleUpdate(ScaleUpdateDetails details) {
     setState(() {
-      _scale = (_previousScale * details.scale).clamp(1.0, 4.0);
+      _scale = (_previousScale! * details.scale).clamp(1.0, 4.0);
       // Ensure that image location under the focal point stays in the same place despite scaling.
-      _offset = _clampOffset(details.focalPoint - _normalizedOffset * _scale);
+      _offset = _clampOffset(details.focalPoint - _normalizedOffset! * _scale);
     });
   }
 
   void _handleOnScaleEnd(ScaleEndDetails details) {
     final double magnitude = details.velocity.pixelsPerSecond.distance;
-    if (magnitude < _kMinFlingVelocity)
-      return;
+    if (magnitude < _kMinFlingVelocity) return;
     final Offset direction = details.velocity.pixelsPerSecond / magnitude;
-    final double distance = (Offset.zero & context.size).shortestSide;
-    _flingAnimation = _controller.drive(Tween<Offset>(
+    final double distance = (Offset.zero & context.size!).shortestSide;
+    _flingAnimation = _controller!.drive(Tween<Offset>(
       begin: _offset,
       end: _clampOffset(_offset + direction * distance),
     ));
-    _controller
+    _controller!
       ..value = 0.0
       ..fling(velocity: magnitude / 1000.0);
   }
@@ -141,8 +140,8 @@ class _GridPhotoViewerState extends State<GridPhotoViewer> with SingleTickerProv
             ..scale(_scale),
           child:
               // Image.network(widget.photo.url,),
-          BkFlutterImage(
-            url: widget.photo.url,
+              BkFlutterImage(
+            url: widget.photo!.url!,
             width: 150,
             height: 150,
             //package: widget.photo.assetPackage,
@@ -157,48 +156,50 @@ class _GridPhotoViewerState extends State<GridPhotoViewer> with SingleTickerProv
 
 class GridDemoPhotoItem extends StatelessWidget {
   GridDemoPhotoItem({
-    Key key,
-    @required this.photo,
-    @required this.tileStyle,
-    @required this.onBannerTap,
-  }) : assert(photo != null && photo.isValid),
+    Key? key,
+    required this.photo,
+    required this.tileStyle,
+    required this.onBannerTap,
+  })  : assert(photo != null && photo.isValid),
         assert(tileStyle != null),
         assert(onBannerTap != null),
         super(key: key);
 
   final Photo photo;
   final GridDemoTileStyle tileStyle;
-  final BannerTapCallback onBannerTap; // User taps on the photo's header or footer.
+  final BannerTapCallback
+      onBannerTap; // User taps on the photo's header or footer.
 
   void showPhoto(BuildContext context) {
-   Navigator.push(context, MaterialPageRoute<void>(
-     builder: (BuildContext context) {
-       return Scaffold(
-         appBar: AppBar(
-           title: Text(photo.title),
-         ),
-         body: SizedBox.expand(
-           child: Hero(
-             tag: photo.tag,
-             child: GridPhotoViewer(photo: photo),
-           ),
-         ),
-       );
-     }
-   ));
+    Navigator.push(context,
+        MaterialPageRoute<void>(builder: (BuildContext context) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(photo.title ?? ''),
+        ),
+        body: SizedBox.expand(
+          child: Hero(
+            tag: photo.tag,
+            child: GridPhotoViewer(photo: photo),
+          ),
+        ),
+      );
+    }));
   }
 
   @override
   Widget build(BuildContext context) {
     final Widget image = GestureDetector(
-      onTap: () { showPhoto(context); },
+      onTap: () {
+        showPhoto(context);
+      },
       child: BkFlutterImage(
-        url: photo.url,
-        fit: photo.mode,
+        url: photo.url!,
+        fit: photo.mode!,
         placeholder: 'images/01.jpg',
         autoResize: true,
-        imageErrorBuilder: (BuildContext context,Object error,StackTrace stacktrace){
-          return Text(error);
+        imageErrorBuilder: (context, error, stacktrace) {
+          return Text(error.toString());
         },
       ),
     );
@@ -209,9 +210,11 @@ class GridDemoPhotoItem extends StatelessWidget {
       case GridDemoTileStyle.deleteMode:
         return GridTile(
           header: GestureDetector(
-            onTap: () { onBannerTap(photo); },
+            onTap: () {
+              onBannerTap(photo);
+            },
             child: GridTileBar(
-              title: _GridTitleText(photo.title),
+              title: _GridTitleText(photo.title ?? ''),
               backgroundColor: Colors.black45,
               leading: Icon(
                 Icons.delete_forever,
@@ -225,11 +228,13 @@ class GridDemoPhotoItem extends StatelessWidget {
       case GridDemoTileStyle.selectMode:
         return GridTile(
           footer: GestureDetector(
-            onTap: () { onBannerTap(photo); },
+            onTap: () {
+              onBannerTap(photo);
+            },
             child: GridTileBar(
               backgroundColor: Colors.black45,
-              title: _GridTitleText(photo.title),
-              subtitle: _GridTitleText(photo.caption),
+              title: _GridTitleText(photo.title ?? ''),
+              subtitle: _GridTitleText(photo.caption ?? ''),
               trailing: Icon(
                 icon,
                 color: Colors.white,
@@ -240,17 +245,15 @@ class GridDemoPhotoItem extends StatelessWidget {
         );
     }
     assert(tileStyle != null);
-    return null;
+    return Container();
   }
-
 }
 
 class GridListDemo extends StatefulWidget {
-  const GridListDemo({ Key key }) : super(key: key);
+  const GridListDemo({Key? key}) : super(key: key);
 
   @override
   GridListDemoState createState() => GridListDemoState();
-
 }
 
 class GridListDemoState extends State<GridListDemo> {
@@ -261,40 +264,44 @@ class GridListDemoState extends State<GridListDemo> {
     super.dispose();
   }
 
- @override
- @override
- void initState() {
-   super.initState();
-    for(int i = 0; i < 10; i ++) {
+  @override
+  @override
+  void initState() {
+    super.initState();
+    for (int i = 0; i < 10; i++) {
       photos.addAll(allModephotos(i));
     }
- }
+  }
 
-  List<Photo> allModephotos(int i){
-    List<Photo> temp =   <Photo>[
+  List<Photo> allModephotos(int i) {
+    List<Photo> temp = <Photo>[
       Photo(
-      url: photosUrls[i],
-      assetPackage: _kGalleryAssetsPackage,
-      title: 'BoxFit.fill',
-      caption: 'Fisherman',mode: BoxFit.fill,
-    ),
+        url: photosUrls[i],
+        assetPackage: _kGalleryAssetsPackage,
+        title: 'BoxFit.fill',
+        caption: 'Fisherman',
+        mode: BoxFit.fill,
+      ),
       Photo(
         url: photosUrls[i],
         assetPackage: _kGalleryAssetsPackage,
         title: 'BoxFit.cover',
-        caption: 'Fisherman',mode: BoxFit.cover,
+        caption: 'Fisherman',
+        mode: BoxFit.cover,
       ),
       Photo(
         url: photosUrls[i],
         assetPackage: _kGalleryAssetsPackage,
         title: 'BoxFit.contain',
-        caption: 'Fisherman',mode: BoxFit.contain,
+        caption: 'Fisherman',
+        mode: BoxFit.contain,
       ),
       Photo(
         url: photosUrls[i],
         assetPackage: _kGalleryAssetsPackage,
         title: 'BoxFit.fitWidth',
-        caption: 'Fisherman',mode: BoxFit.fitWidth,
+        caption: 'Fisherman',
+        mode: BoxFit.fitWidth,
       ),
       Photo(
         url: photosUrls[i],
@@ -314,8 +321,7 @@ class GridListDemoState extends State<GridListDemo> {
     return temp;
   }
 
-  List<Photo> photos = <Photo>[
-  ];
+  List<Photo> photos = <Photo>[];
 
   void changeTileStyle(GridDemoTileStyle value) {
     setState(() {
@@ -333,7 +339,8 @@ class GridListDemoState extends State<GridListDemo> {
           //MaterialDemoDocumentationButton(GridListDemo.routeName),
           PopupMenuButton<GridDemoTileStyle>(
             onSelected: changeTileStyle,
-            itemBuilder: (BuildContext context) => <PopupMenuItem<GridDemoTileStyle>>[
+            itemBuilder: (BuildContext context) =>
+                <PopupMenuItem<GridDemoTileStyle>>[
               const PopupMenuItem<GridDemoTileStyle>(
                 value: GridDemoTileStyle.deleteMode,
                 child: Text('Delete Mode'),
@@ -346,37 +353,39 @@ class GridListDemoState extends State<GridListDemo> {
           ),
         ],
       ),
-      body:
-      Column( children: <Widget>[
-         Expanded( child: SafeArea(
-                        top: false,
-                        bottom: false,
-                        child: GridView.count(
-                      crossAxisCount:  (orientation == Orientation.portrait) ? 2 : 3,
-                        mainAxisSpacing: 4.0,
-                        crossAxisSpacing: 4.0,
-                        padding: const EdgeInsets.all(4.0),
-                    childAspectRatio: (orientation == Orientation.portrait) ? 1.0 : 1.3,
-                    children: photos.map<Widget>((Photo photo) {
-                      return GridDemoPhotoItem(
-                        photo: photo,
-                        tileStyle: _tileStyle,
-                        onBannerTap: (Photo photo) {
-                          setState(() {
-                            if (GridDemoTileStyle.deleteMode == _tileStyle) {
-                              photos.remove(photo);
-                            } else {
-                              photo.isFavorite = !photo.isFavorite;
-                            }
-                          });
-                        },
-                      );
-                    }).toList(),
-                  ),
-                ),
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            child: SafeArea(
+              top: false,
+              bottom: false,
+              child: GridView.count(
+                crossAxisCount: (orientation == Orientation.portrait) ? 2 : 3,
+                mainAxisSpacing: 4.0,
+                crossAxisSpacing: 4.0,
+                padding: const EdgeInsets.all(4.0),
+                childAspectRatio:
+                    (orientation == Orientation.portrait) ? 1.0 : 1.3,
+                children: photos.map<Widget>((Photo photo) {
+                  return GridDemoPhotoItem(
+                    photo: photo,
+                    tileStyle: _tileStyle,
+                    onBannerTap: (Photo photo) {
+                      setState(() {
+                        if (GridDemoTileStyle.deleteMode == _tileStyle) {
+                          photos.remove(photo);
+                        } else {
+                          photo.isFavorite = !photo.isFavorite;
+                        }
+                      });
+                    },
+                  );
+                }).toList(),
               ),
-            ],
-    ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

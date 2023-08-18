@@ -265,7 +265,6 @@ class GridListDemoState extends State<GridListDemo> {
   }
 
   @override
-  @override
   void initState() {
     super.initState();
     for (int i = 0; i < 10; i++) {

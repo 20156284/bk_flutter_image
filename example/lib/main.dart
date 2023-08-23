@@ -46,16 +46,16 @@ class _MainPageState extends State<MainPage> {
           IconButton(
               icon: Icon(Icons.list),
               onPressed: () {
-                Navigator.push(
-                    context,
-                    DialogRoute(
-                        context: context,
-                        builder: (c) {
-                          return GridListDemo();
-                        }));
-                // Navigator.push(context, MaterialPageRoute(builder: (c) {
-                //   return GridListDemo();
-                // }));
+                // Navigator.push(
+                //     context,
+                //     DialogRoute(
+                //         context: context,
+                //         builder: (c) {
+                //           return GridListDemo();
+                //         }));
+                Navigator.push(context, MaterialPageRoute(builder: (c) {
+                  return GridListDemo();
+                }));
               })
         ],
       ),

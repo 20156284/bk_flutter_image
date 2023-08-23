@@ -1,6 +1,7 @@
 name: bk_flutter_image_example
 description: Demonstrates how to use the bk_flutter_image plugin.
 publish_to: 'none'
+version: 0.1.1
 
 environment:
   sdk: ">=2.12.0 <4.0.0"

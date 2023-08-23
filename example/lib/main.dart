@@ -35,7 +35,7 @@ class _MainPageState extends State<MainPage> {
   BoxFit fit = BoxFit.cover;
   bool useFlutterImage = true;
   String imageUrl =
-      'https://image2.ljcdn.com/utopia-file/p1/215a16c18b2c6ad44a61ff077f12b64fd937398c-3840-2560!m_fit,w_2560,o_auto,f_jpg';
+      'https://p9.itc.cn/images01/20200624/ea051d6190c34123a4faf0eedcc70f16.jpeg';
 
   @override
   Widget build(BuildContext context) {
@@ -46,16 +46,16 @@ class _MainPageState extends State<MainPage> {
           IconButton(
               icon: Icon(Icons.list),
               onPressed: () {
-                Navigator.push(
-                    context,
-                    DialogRoute(
-                        context: context,
-                        builder: (c) {
-                          return GridListDemo();
-                        }));
-                // Navigator.push(context, MaterialPageRoute(builder: (c) {
-                //   return GridListDemo();
-                // }));
+                // Navigator.push(
+                //     context,
+                //     DialogRoute(
+                //         context: context,
+                //         builder: (c) {
+                //           return GridListDemo();
+                //         }));
+                Navigator.push(context, MaterialPageRoute(builder: (c) {
+                  return GridListDemo();
+                }));
               })
         ],
       ),
@@ -241,19 +241,25 @@ class _MainPageState extends State<MainPage> {
                 Container(
                   // width: 400,
                   // height: 100,
-                  child: useFlutterImage
-                      ? BkFlutterImage(
-                          url: imageUrl,
-                          height: height,
-                          width: width,
-                          fit: fit,
-                        )
-                      : Image.network(
-                          imageUrl,
-                          fit: fit,
-                          width: width,
-                          height: height,
-                        ),
+                  // child: useFlutterImage
+                  //     ? BkFlutterImage(
+                  //         url: imageUrl,
+                  //         height: height,
+                  //         width: width,
+                  //         fit: fit,
+                  //       )
+                  //     : Image.network(
+                  //         imageUrl,
+                  //         fit: fit,
+                  //         width: width,
+                  //         height: height,
+                  //       ),
+                  child: BkFlutterImage(
+                    url: imageUrl,
+                    height: height,
+                    width: width,
+                    fit: fit,
+                  ),
                 ),
               ]),
             ),

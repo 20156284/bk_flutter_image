@@ -1,8 +1,9 @@
 import 'dart:async';
-import 'dart:convert';
+import 'dart:typed_data';
 
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:universal_html/html.dart' as html;
 
 class BkFlutterImageImpl extends StatefulWidget {
   const BkFlutterImageImpl({
@@ -37,30 +38,84 @@ class BkFlutterImageImpl extends StatefulWidget {
 }
 
 class _BkFlutterImageState extends State<BkFlutterImageImpl> {
-  @override
-  Widget build(BuildContext context) {
-    // String? placeholder = widget.placeholder;
+  Uint8List? bytes;
 
-    // if (placeholder == null || placeholder == '') {
-    return Image.network(
-      widget.url,
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    loadImage();
+  }
+
+  Future<void> loadImage() async {
+    bytes = await getImage(url: widget.url);
+    if (bytes != null) {
+      setState(() {});
+    }
+  }
+
+  //获取图片的data
+  static Future<Uint8List?> getImage({
+    required String url,
+  }) async {
+    if (url.contains('http')) {
+      return html.HttpRequest.request(url,
+              method: 'get', responseType: 'arraybuffer')
+          .then((xhr) async {
+        if (xhr.response != null) {
+          final ByteBuffer bb = xhr.response;
+          // return base64Encode(bb.asUint8List());
+
+          return bb.asUint8List();
+        }
+        return null;
+      }).onError((error, stackTrace) {
+        return null;
+      });
+    } else {
+      return null;
+    }
+  }
+
+  Widget getImageForData() {
+    return Image.memory(
+      bytes!,
       width: widget.width,
       height: widget.height,
       fit: widget.fit,
+      gaplessPlayback: true,
       cacheWidth: widget.cacheWidth?.toInt(),
       cacheHeight: widget.cacheHeight?.toInt(),
       errorBuilder: widget.imageErrorBuilder,
+      frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+        if (wasSynchronouslyLoaded) {
+          return child;
+        }
+        return AnimatedOpacity(
+          opacity: frame == null ? 0 : 1,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeIn,
+          child: child,
+        );
+      },
     );
-    // } else {//web添加placeholder，动画有bug
-    //   return FadeInImage.assetNetwork(
-    //       placeholder: placeholder,
-    //       image: widget.url,
-    //       width: widget.width,
-    //       height: widget.height,
-    //       fit: widget.fit,
-    //       imageCacheHeight: widget.cacheHeight?.toInt(),
-    //       imageCacheWidth: widget.cacheWidth?.toInt(),
-    //       imageErrorBuilder: widget.imageErrorBuilder);
-    // }
   }
+
+  @override
+  Widget build(BuildContext context) {
+    return bytes == null
+        ? Container(
+            width: widget.width,
+            height: widget.height,
+            color: Colors.grey.withOpacity(0.2),
+          )
+        : getImageForData();
+  }
+}
+
+logger(dynamic msg) {
+  assert(() {
+    debugPrint('[DEBUG] # $msg');
+    return true;
+  }());
 }
